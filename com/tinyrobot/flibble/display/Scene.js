@@ -2,7 +2,8 @@ jingo.declare({
 	require: [
 		'util.Class',
 		'com.tinyrobot.flibble.geom.Point',
-		'com.tinyrobot.flibble.display.DisplayObject'
+		'com.tinyrobot.flibble.display.DisplayObject',
+		'com.tinyrobot.flibble.event.MouseEvent'
 	],
   name: 'com.tinyrobot.flibble.display.Scene',
   as: function() {
@@ -36,17 +37,17 @@ jingo.declare({
 					var pt = {x:e.clientX - offset.left,y:e.clientY-offset.top};
 					that.root.mousex = pt.x;
 					that.root.mousey = pt.y;
-					that.propagate(that.root,'onmousemove');
+					that.propagate(that.root,MouseEvent.MOUSE_MOVE);
 				}
 				
 				this.canvas.onclick = function(e){
-					that.propagate(that.root,'onclick');
+					that.propagate(that.root,MouseEvent.CLICK);
 				}
 				this.canvas.onmousedown = function(e){
-					that.propagate(that.root,'onmousedown');
+					that.propagate(that.root,MouseEvent.MOUSE_DOWN);
 				}
 				this.canvas.onmouseup = function(e){
-					that.propagate(that.root,'onmouseup');
+					that.propagate(that.root,MouseEvent.MOUSE_UP);
 				}
 				
 			},
@@ -60,22 +61,23 @@ jingo.declare({
 				var bounds = node.getAABB();
 				
 				if(pt.x > bounds.x && pt.x < bounds.x+bounds.width&&pt.y>bounds.y&&pt.y<bounds.y+bounds.height){
-					if(method == "onmousemove"){
+					if(method == MouseEvent.MOUSE_MOVE){
 						if(!node._mousedover){
 							node._mousedover = true;
-							if(node.onmouseover) node.onmouseover();
+							if(node.listeners[MouseEvent.MOUSE_OVER]) node.dispatchEvent(MouseEvent.MOUSE_OVER,new MouseEvent(MouseEvent.MOUSE_OVER,this.root.mousex,this.root.mousey));
 						}
 					}
-					if(node[method]) node[method]();
+					
+					if(node.listeners[method]) node.dispatchEvent(method,new MouseEvent(method,this.root.mousex,this.root.mousey));
 					
 					for(var i = 0; i < node.children.length; i++){
 						this.propagate(node.children[i],method);
 					}
 				}else{
-					if(method == "onmousemove"){
+					if(method == MouseEvent.MOUSE_MOVE){
 						if(node._mousedover){
 							node._mousedover = false;
-							if(node.onmouseout) node.onmouseout();
+							if(node.listeners[MouseEvent.MOUSE_OUT]) node.dispatchEvent(MouseEvent.MOUSE_OUT,new MouseEvent(MouseEvent.MOUSE_OUT,this.root.mousex,this.root.mousey));
 						}
 					}
 				}

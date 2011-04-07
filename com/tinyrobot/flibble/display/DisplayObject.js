@@ -3,12 +3,15 @@ jingo.declare({
 		'util.Class',
 		'com.tinyrobot.flibble.geom.Point',
 		'com.tinyrobot.flibble.geom.Matrix',
-		'com.tinyrobot.flibble.geom.Rectangle'
+		'com.tinyrobot.flibble.geom.Rectangle',
+		'com.tinyrobot.flibble.event.EventDispatcher'
 	],
   name: 'com.tinyrobot.flibble.display.DisplayObject',
   as: function() {
-    DisplayObject = Class.extend({
+    DisplayObject = EventDispatcher.extend({
 			init: function(){
+				this._super();
+				
 				this.alpha = 1;
 				this.children = [];
 				this.mouseEnabled = true;
